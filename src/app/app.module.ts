@@ -12,6 +12,8 @@ import { LoadWeatherService } from 'src/domain/services/load-weather.service';
 import { LocalCityRepository } from 'src/data/local-city-repository';
 import { ApiWeatherRepository } from 'src/data/api-weather-repository';
 
+import { IonicStorageModule, Storage } from '@ionic/storage-angular'; //Importa o module do storage para ser utilizado na aplicação
+import { CityHistoryService } from 'src/domain/services/city-history.service';
 const createSearchCityService = () => {
   return new SearchCityService(new LocalCityRepository());
 };
@@ -23,6 +25,10 @@ const createLoadWeatherService = (http: HttpClient) => {
   );
 };
 
+const createCityHistoryService = () => {
+  return new CityHistoryService(new LocalCityRepository(), new Storage());
+};
+
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -31,6 +37,7 @@ const createLoadWeatherService = (http: HttpClient) => {
     IonicModule.forRoot(),
     AppRoutingModule,
     HttpClientModule,
+    IonicStorageModule.forRoot(), //registra a importação
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
@@ -42,6 +49,11 @@ const createLoadWeatherService = (http: HttpClient) => {
       provide: LoadWeatherService,
       useFactory: createLoadWeatherService,
       deps: [HttpClient],
+    },
+    {
+      provide: CityHistoryService,
+      useFactory: createCityHistoryService,
+      deps: [Storage],
     },
   ],
   bootstrap: [AppComponent],
